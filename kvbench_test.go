@@ -52,7 +52,7 @@ func getUser(i int) *User {
 	}
 }
 
-func BenchmarkCouchBaseInsertgocb(b *testing.B) {
+func BenchmarkCouchBaseInsertgocb1(b *testing.B) {
 	var err error
 
 	db_url, err := url.Parse(*couchBaseUrl)
@@ -74,7 +74,7 @@ func BenchmarkCouchBaseInsertgocb(b *testing.B) {
 }
 
 
-func BenchmarkCouchBaseGetgocb(b *testing.B) {
+func BenchmarkCouchBaseGetgocb2(b *testing.B) {
 	var err error
 
 	db_url, err := url.Parse(*couchBaseUrl)
