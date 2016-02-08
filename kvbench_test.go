@@ -36,20 +36,18 @@ func mf(err error, msg string, b *testing.B) {
 func init() {
 	flag.Parse()
 	rand.Seed(time.Now().UTC().UnixNano())
-	for i := 0; i < 200000; i++ {
-		users = append(users, getUser(i))
-	}
-
 }
-func getUser(i int) *User {
-	email := fmt.Sprintf("user%d%s@domain.com", i, uuid.NewV4().String())
+func getUser(i int, randstr string) *User {
+	email := fmt.Sprintf("user%d%s@domain.com", i, randstr)
 	id := uuid.NewV5(uuid.NamespaceOID, email).String()
-	return &User{
+	user := &User{
 		Id:        id,
 		Email:     email,
 		FirstName: uuid.NewV4().String(),
 		LastName:  uuid.NewV4().String(),
 	}
+	users = append(users, user)
+	return user
 }
 
 func BenchmarkCouchBaseInsertgocb1(b *testing.B) {
@@ -67,9 +65,8 @@ func BenchmarkCouchBaseInsertgocb1(b *testing.B) {
 
 	b.ResetTimer()
 
-	for i := 0; i < b.N && len(insertUsers) > 0; i++ {
-		var user *User
-		user, insertUsers = insertUsers[0], insertUsers[1:]
+	for i := 0; i < b.N; i++ {
+		user := getUser(i, uuid.NewV4().String())
 		_, err := bucket.Insert(user.Id, user, 0)
 		mf(err, "Insert", b)
 	}
