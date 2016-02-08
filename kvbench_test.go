@@ -66,7 +66,7 @@ func BenchmarkCouchBaseInsertgocb1(b *testing.B) {
 
 	b.ResetTimer()
 
-	for i := 0; i < b.N; i++ {
+	for i := 0; i < b.N && len(insertUsers) > 0; i++ {
 		var user *User
 		user, insertUsers = insertUsers[0], insertUsers[1:]
 		_, err := bucket.Insert(user.Id, user, 0)
@@ -91,8 +91,7 @@ func BenchmarkCouchBaseGetgocb2(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		user := &User{}
-		u := users[i]
-		_, err := bucket.Get(u.Id, *user)
+		_, err := bucket.Get(users[i].Id, *user)
 		mf(err, "Get", b)
 	}
 }
