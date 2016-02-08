@@ -87,9 +87,10 @@ func BenchmarkCouchBaseGetgocb2(b *testing.B) {
 
 	b.ResetTimer()
 
+	max := len(users)
 	for i := 0; i < b.N; i++ {
 		user := &User{}
-		_, err := bucket.Get(users[i].Id, *user)
+		_, err := bucket.Get(users[rand.Intn(max)].Id, *user)
 		mf(err, "Get", b)
 	}
 }
