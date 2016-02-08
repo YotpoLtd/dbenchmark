@@ -54,7 +54,7 @@ func getUser(i int) *User {
 
 func BenchmarkCouchBaseInsertgocb1(b *testing.B) {
 	var err error
-	insertUsers := append([]User(nil), users...)
+	insertUsers := append([]*User(nil), users...)
 	db_url, err := url.Parse(*couchBaseUrl)
 	mf(err, "parse", b)
 
