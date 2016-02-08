@@ -1,0 +1,29 @@
+couchbase1:
+  image: couchbase/server
+  ports:
+  - "8091:8091"
+  - "8092:8092"
+  - "8093:8093"
+  - "11207:11207"
+  - "11210:11210"
+  - "11211:11211"
+  - "18091:18091"
+  - "18092:18092"
+  links:
+  - couchbase2
+  volumes:
+  - "./couchbase/db1:/opt/couchbase/var"
+
+couchbase2:
+  image: couchbase/server
+  ports:
+  - "8094:8091"
+  - "8095:8092"
+  - "8096:8093"
+  - "11208:11207"
+  - "11212:11210"
+  - "11213:11211"
+  - "18093:18091"
+  - "18094:18092"
+  volumes:
+  - "./couchbase/db2:/opt/couchbase/var"
