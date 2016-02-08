@@ -67,7 +67,7 @@ func BenchmarkCouchBaseInsertgocb1(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		var user User
+		var user *User
 		user, insertUsers = insertUsers[0], insertUsers[1:]
 		_, err := bucket.Insert(user.Id, user, 0)
 		mf(err, "Insert", b)
