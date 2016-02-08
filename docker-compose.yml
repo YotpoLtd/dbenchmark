@@ -9,8 +9,6 @@ couchbase1:
   - "11211:11211"
   - "18091:18091"
   - "18092:18092"
-  links:
-  - couchbase2
   volumes:
   - "./couchbase/db1:/opt/couchbase/var"
 
@@ -27,3 +25,11 @@ couchbase2:
   - "18094:18092"
   volumes:
   - "./couchbase/db2:/opt/couchbase/var"
+
+bm:
+  image: golang:alpine
+  volumes:
+  - ".:/go/src/github.com/YotpoLtd/dbenchmark"
+  links:
+  - "couchbase2:couchbase2"
+  - "couchbase1:couchbase1"
