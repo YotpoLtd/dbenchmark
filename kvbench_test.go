@@ -92,6 +92,6 @@ func BenchmarkCouchBaseGetgocb2(b *testing.B) {
 		user := &User{}
 		u := users[i]
 		_, err := bucket.Get(u.Id, *user)
-		mf(err, "Insert", b)
+		mf(err, "Get", b)
 	}
 }
