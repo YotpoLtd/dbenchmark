@@ -4,18 +4,19 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/url"
 	"testing"
-        "math/rand"
 	"time"
 
 	"github.com/couchbase/gocb"
-	//"github.com/couchbase/go-couchbase"
 	"github.com/satori/go.uuid"
 )
 
-var couchBaseUrl = flag.String("couchbase-url", "couchbase://127.0.0.1", "The url to connect to CouchBase")
-var couchBaseBucket = flag.String("couchbase-bucket", "default", "The bucket to use in CouchBase")
+var (
+	couchBaseUrl    = flag.String("couchbase-url", "couchbase://127.0.0.1", "The url to connect to CouchBase")
+	couchBaseBucket = flag.String("couchbase-bucket", "default", "The bucket to use in CouchBase")
+)
 
 type User struct {
 	Id        string `json:"id"`
@@ -33,48 +34,20 @@ func mf(err error, msg string, b *testing.B) {
 
 func init() {
 	flag.Parse()
-        rand.Seed(time.Now().UTC().UnixNano())
+	rand.Seed(time.Now().UTC().UnixNano())
 }
-func getUser(i int) *User{
-        email := fmt.Sprintf("user%d%s@domain.com", i, uuid.NewV4().String())
-        id := uuid.NewV5(uuid.NamespaceOID, email).String()
+func getUser(i int) *User {
+	email := fmt.Sprintf("user%d%s@domain.com", i, uuid.NewV4().String())
+	id := uuid.NewV5(uuid.NamespaceOID, email).String()
 	return &User{
-                Id:        id,
-                Email:	   email,
-                FirstName: uuid.NewV4().String(),
-                LastName:  uuid.NewV4().String(),
-        }
+		Id:        id,
+		Email:     email,
+		FirstName: uuid.NewV4().String(),
+		LastName:  uuid.NewV4().String(),
+	}
 }
-//func BenchmarkCouchBasegocouchbase(b *testing.B) {
-//	var err error
-//
-//	db_url, err := url.Parse(*couchBaseUrl)
-//	mf(err, "parse", b)
-//
-//
-//	log.Println("Connecting To Couchbase: ", db_url.String())
-//	cluster, err := couchbase.Connect(db_url.String())
-//	mf(err, "connect - "+db_url.String(), b)
-//
-//	pool, err := cluster.GetPool("default")
-//	mf(err, "pool", b)
-//
-//	log.Println("Connecting To Bucket: ", *couchBaseBucket)
-//	bucket, err := pool.GetBucket(*couchBaseBucket)
-//	mf(err, "bucket", b)
-//
-//	b.ResetTimer()
-//
-//	for i := 0; i < b.N; i++ {
-//		added, err := bucket.Add(users[i].Id, 0, users[i])
-//		mf(err, "add", b)
-//		if !added {
-//			log.Printf("couldn't add user %v", users[i])
-//		}
-//	}
-//}
 
-func BenchmarkCouchBasegocb(b *testing.B) {
+func BenchmarkCouchBaseInsertgocb(b *testing.B) {
 	var err error
 
 	db_url, err := url.Parse(*couchBaseUrl)
@@ -85,40 +58,37 @@ func BenchmarkCouchBasegocb(b *testing.B) {
 
 	bucket, err := cluster.OpenBucket(*couchBaseBucket, "")
 	mf(err, "bucket", b)
-
+	var users []*User
+	for i := 0; i < b.N; i++ {
+		users = append(users, getUser(i))
+	}
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		user := getUser(i)
+		user := users[i]
 		_, err := bucket.Insert(user.Id, user, 0)
 		mf(err, "Insert", b)
 	}
 }
 
 //
-//func BenchmarkCassandra(b *testing.B) {
+//func BenchmarkCouchBaseGetgocb(b *testing.B) {
 //	var err error
-//	//Connect to db
-//	if err != nil {
-//		b.Fatal(err)
-//	}
+//
+//	db_url, err := url.Parse(*couchBaseUrl)
+//	mf(err, "parse", b)
+//
+//	cluster, err := gocb.Connect(db_url.String())
+//	mf(err, "connect - "+db_url.String(), b)
+//
+//	bucket, err := cluster.OpenBucket(*couchBaseBucket, "")
+//	mf(err, "bucket", b)
+//
 //	b.ResetTimer()
 //
 //	for i := 0; i < b.N; i++ {
-//
+//		user := &User{}
+//		_, err := bucket.Get(user.Id, *user)
+//		mf(err, "Insert", b)
 //	}
 //}
-//
-//func BenchmarkSkylla(b *testing.B) {
-//	var err error
-//	//Connect to db
-//	if err != nil {
-//		b.Fatal(err)
-//	}
-//	b.ResetTimer()
-//
-//	for i := 0; i < b.N; i++ {
-//
-//	}
-//}
-
