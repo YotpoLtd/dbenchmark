@@ -54,7 +54,7 @@ func getUser(i int) *User {
 
 func BenchmarkCouchBaseInsertgocb1(b *testing.B) {
 	var err error
-
+	insertUsers := append([]User(nil), users...)
 	db_url, err := url.Parse(*couchBaseUrl)
 	mf(err, "parse", b)
 
@@ -67,7 +67,8 @@ func BenchmarkCouchBaseInsertgocb1(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		user := users[i]
+		var user User
+		user, insertUsers = insertUsers[0], insertUsers[1:]
 		_, err := bucket.Insert(user.Id, user, 0)
 		mf(err, "Insert", b)
 	}
