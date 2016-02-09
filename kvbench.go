@@ -28,17 +28,18 @@ func (hl *hostList) Set(value string) error {
 }
 
 var (
-	testCouchbase      = flag.Bool("test-couchbase", false, "Decide wether or not to test chouchbase (false)")
+	testCouchBase      = flag.Bool("test-couchbase", false, "Decide wether or not to test chouchbase (false)")
 	couchBaseUrl       = flag.String("couchbase-url", "couchbase://127.0.0.1", "The url to connect to CouchBase (couchbase://127.0.0.1)")
 	couchBaseBucket    = flag.String("couchbase-bucket", "default", "The bucket to use in CouchBase (default)")
 	couchBaseTestUsers []*User
 
-	cassandraHosts     = hostList{"127.0.0.1"}
+	cassandraHosts     = hostList{}
 	cassandraTestUsers []*User
 
-	testCassandra     = flag.Bool("test-cassandra", false, "Decide wether or not to test cassandra (false)")
-	cassandraPort     = flag.Int("cassandra-port", 9042, "The host on which cassandra runs (9042)")
-	cassandraKeyspace = flag.String("cassandra-keyspace", "benchtest", "The host on which cassandra runs (benchtest)")
+	testCassandra       = flag.Bool("test-cassandra", false, "Decide wether or not to test cassandra (false)")
+	cassandraPort       = flag.Int("cassandra-port", 9042, "The host on which cassandra runs (9042)")
+	cassandraKeyspace   = flag.String("cassandra-keyspace", "benchtest", "The host on which cassandra runs (benchtest)")
+	cassandraCQLVersion = flag.String("cassandra-cql-version", "3.2.0", "The CQL version which cassandra uses (3.2.0)")
 )
 
 type User struct {
@@ -60,6 +61,9 @@ func init() {
 	flag.Parse()
 	if flag.NFlag() == 0 {
 		flag.PrintDefaults()
+	}
+	if len(cassandraHosts) == 0 {
+		cassandraHosts = hostList{"127.0.0.1"}
 	}
 	rand.Seed(time.Now().UTC().UnixNano())
 }
@@ -155,8 +159,8 @@ func BenchmarkCassandraGet(b *testing.B) {
 
 func getCassandraCluster() *gocql.ClusterConfig {
 	cluster := gocql.NewCluster(cassandraHosts...)
-	cluster.CQLVersion = "3.2.0"
-	cluster.Keyspace = "dbench"
+	cluster.CQLVersion = *cassandraCQLVersion
+	cluster.Keyspace = *cassandraKeyspace
 	cluster.Port = *cassandraPort
 	return cluster
 }
@@ -191,7 +195,7 @@ func main() {
 	fmt.Println("Done")
 	var benchmarkResults map[string]testing.BenchmarkResult
 	benchmarkResults = make(map[string]testing.BenchmarkResult)
-	if *testCouchbase {
+	if *testCouchBase {
 		benchmarkResults["CouchBaseInsert"] = testing.Benchmark(BenchmarkCouchBaseInsertgocb)
 		benchmarkResults["CouchBaseGet"] = testing.Benchmark(BenchmarkCouchBaseGetgocb)
 	}
