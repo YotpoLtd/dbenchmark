@@ -1,0 +1,5 @@
+.git*
+*.go
+*.md
+docker-compose.yml
+
