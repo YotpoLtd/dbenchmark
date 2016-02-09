@@ -168,6 +168,7 @@ func getCassandraCluster() *gocql.ClusterConfig {
 }
 
 func prepareCassandraCluster(cluster *gocql.ClusterConfig) {
+	cluster.Keyspace = "system"
 	session, err := cluster.CreateSession()
 	if err != nil {
 		panic(err)
