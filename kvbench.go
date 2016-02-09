@@ -36,10 +36,11 @@ var (
 	cassandraHosts     = hostList{}
 	cassandraTestUsers []*User
 
-	testCassandra       = flag.Bool("test-cassandra", false, "Decide wether or not to test cassandra (false)")
-	cassandraPort       = flag.Int("cassandra-port", 9042, "The host on which cassandra runs (9042)")
-	cassandraKeyspace   = flag.String("cassandra-keyspace", "benchtest", "The host on which cassandra runs (benchtest)")
-	cassandraCQLVersion = flag.String("cassandra-cql-version", "3.2.0", "The CQL version which cassandra uses (3.2.0)")
+	testCassandra            = flag.Bool("test-cassandra", false, "Decide wether or not to test cassandra (false)")
+	cassandraPort            = flag.Int("cassandra-port", 9042, "The host on which cassandra runs (9042)")
+	cassandraKeyspace        = flag.String("cassandra-keyspace", "benchtest", "The host on which cassandra runs (benchtest)")
+	cassandraCQLVersion      = flag.String("cassandra-cql-version", "3.4.0", "The CQL version which cassandra uses (3.2.0)")
+	cassandraProtocolVersion = flag.Int("cassandra-protocol-version", 4, "The CQL version which cassandra uses (4)")
 )
 
 type User struct {
@@ -162,6 +163,7 @@ func getCassandraCluster() *gocql.ClusterConfig {
 	cluster.CQLVersion = *cassandraCQLVersion
 	cluster.Keyspace = *cassandraKeyspace
 	cluster.Port = *cassandraPort
+	cluster.ProtoVersion = *cassandraProtocolVersion
 	return cluster
 }
 
